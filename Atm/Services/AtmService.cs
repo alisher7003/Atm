@@ -12,7 +12,7 @@ namespace Atm.Services
     {
         private Card EmvCard { get; set; }
         private decimal Money { get; set; }
-        private V1Logger LogHelper { get; set; }
+        private Logger LogHelper { get; set; }
         public AtmService()
         {
             Initialize();
