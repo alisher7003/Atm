@@ -4,25 +4,29 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Atm.Model;
 
-namespace Atm
+namespace Atm.Services
 {
     public class AtmService
     {
-        public Card EmvCard { get; set; }
+        private Card EmvCard { get; set; }
+        private decimal Money { get; set; }
+        private V1Logger LogHelper { get; set; }
         public AtmService()
         {
-            Init();
+            Initialize();
         }
 
-        private void Init()
+        private void Initialize()
         {
+            LogHelper = new V1Logger();
             Card card = new Card();
             card.Balance = 2000000;
             card.IsSmsOn = false;
             EmvCard = card;
             string selection;
-            Console.WriteLine("Welcome to ATM");
+            LogHelper.LogInformation("Welcome to ATM");
             do
             {
                 ShowMenu();
@@ -37,7 +41,7 @@ namespace Atm
             var isValidNumber = false;
             do
             {
-                Console.WriteLine("1. Balance");
+                LogHelper.LogInformation("1. Balance");
                 Console.WriteLine("2. SMS ON/OFF");
                 Console.WriteLine("3. WITHDRAW");
 
@@ -46,7 +50,7 @@ namespace Atm
                 if (!isValidNumber || inputNum < 1 || inputNum > 3)
                 {
                     isValidNumber = false;
-                    Console.WriteLine("Try again, please");
+                    LogHelper.LogInformation("Try again, please");
                 }
             } while (!isValidNumber);
 
@@ -60,8 +64,8 @@ namespace Atm
 
         private void ShowBalanceMenu()
         {
-            Console.WriteLine("1. On display");
-            Console.WriteLine("2. Print receipt");
+            LogHelper.LogInformation("1. On display");
+            LogHelper.LogInformation("2. Print receipt");
 
             var inputNumber = int.Parse(Console.ReadLine()!);
             if (inputNumber == 1)
@@ -72,23 +76,23 @@ namespace Atm
 
         private void ShowBalanceToDisplay()
         {
-            Console.WriteLine($"Displayed to Monitor");
-            Console.WriteLine($"Your balance: {EmvCard.Balance} so'm");
+            LogHelper.LogInformation($"Displayed to Monitor");
+            LogHelper.LogInformation($"Your balance: {EmvCard.Balance} so'm");
         }
 
         private void ShowBalanceToReceipt()
         {
-            Console.WriteLine("***************************************");
-            Console.WriteLine($"DateTime: {DateTime.Now}");
-            Console.WriteLine($"Your balance: {EmvCard.Balance} so'm");
-            Console.WriteLine($"SMS on/off: {(EmvCard.IsSmsOn ? "ON" : "OFF")}");
-            Console.WriteLine("***************************************");
+            LogHelper.LogInformation("***************************************");
+            LogHelper.LogInformation($"DateTime: {DateTime.Now}");
+            LogHelper.LogInformation($"Your balance: {EmvCard.Balance} so'm");
+            LogHelper.LogInformation($"SMS on/off: {(EmvCard.IsSmsOn ? "ON" : "OFF")}");
+            LogHelper.LogInformation("***************************************");
         }
 
         private void ShowSmsMenu()
         {
-            Console.WriteLine("1. Turn on message");
-            Console.WriteLine("2. Turn off message");
+            LogHelper.LogInformation("1. Turn on message");
+            LogHelper.LogInformation("2. Turn off message");
 
             var inputNumber = int.Parse(Console.ReadLine()!);
             if (inputNumber == 1)
@@ -105,7 +109,7 @@ namespace Atm
             {
                 EmvCard.IsSmsOn = true;
                 EmvCard.Phone = phone;
-                Console.WriteLine("Phone is successfully added!");
+                LogHelper.LogInformation("Phone is successfully added!");
             }
         }
 
@@ -113,14 +117,14 @@ namespace Atm
         {
             EmvCard.IsSmsOn = false;
             EmvCard.Phone = "";
-            Console.WriteLine("Phone is successfully deleted!");
+            LogHelper.LogInformation("Phone is successfully deleted!");
         }
 
         private void ShowWithDrawMenu()
         {
-            Console.WriteLine("1. 100 000 sum");
-            Console.WriteLine("2. 200 000 sum");
-            Console.WriteLine("3. Other sum");
+            LogHelper.LogInformation("1. 100 000 sum");
+            LogHelper.LogInformation("2. 200 000 sum");
+            LogHelper.LogInformation("3. Other sum");
 
             var yourChoice = int.Parse(Console.ReadLine()!);
             if (yourChoice == 1)
@@ -139,25 +143,57 @@ namespace Atm
 
         private void WithDraw100000()
         {
-            EmvCard.Balance -= 100000;
-            Console.WriteLine("WithDrawed 100000 so'm");
-            Console.WriteLine($"Current balance: {EmvCard.Balance}");
+            Money = 100000;
+            if (!CheckBalance())
+            {
+                return;
+            }
+            EmvCard.Balance -= Money;
+            LogHelper.LogInformation("WithDrawed 100000 so'm");
+            LogHelper.LogInformation($"Current balance: {EmvCard.Balance}");
         }
 
         private void WithDraw200000()
         {
-            EmvCard.Balance -= 200000;
-            Console.WriteLine("WithDrawed 200000 so'm");
-            Console.WriteLine($"Current balance: {EmvCard.Balance}");
+            Money = 200000;
+            if (!CheckBalance())
+            {
+                return;
+            }
+            EmvCard.Balance -= Money;
+            LogHelper.LogInformation("WithDrawed 200000 so'm");
+            LogHelper.LogInformation($"Current balance: {EmvCard.Balance}");
         }
 
         private void WithDrawYourChoice()
         {
+
             Console.Write("Enter the amount of money: ");
-            var money = decimal.Parse(Console.ReadLine()!);
-            EmvCard.Balance -= money;
-            Console.WriteLine($"Withdrawed {money} so'm");
-            Console.WriteLine($"Current balance: {EmvCard.Balance}");
+            Money = decimal.Parse(Console.ReadLine()!);
+            if (!CheckBalance())
+            {
+                return;
+            }
+            EmvCard.Balance -= Money;
+            LogHelper.LogInformation($"Withdrawed {Money} so'm");
+            LogHelper.LogInformation($"Current balance: {EmvCard.Balance}");
+
+        }
+
+        private bool CheckBalance()
+        {
+            if (EmvCard.Balance - Money >= 0)
+            {
+                return true;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                LogHelper.LogInformation($"Current balance is: {EmvCard.Balance} so'm. Your balance is not enough!");
+                Console.ForegroundColor = ConsoleColor.White;
+                ShowMenu();
+                return false;
+            }
         }
     }
 }

@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Atm
+namespace Atm.Model
 {
     public class Card
     {
-        public decimal Balance {  get; set; }
+        public decimal Balance { get; set; }
 
         public bool IsSmsOn { get; set; }
 

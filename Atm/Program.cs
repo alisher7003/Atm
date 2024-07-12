@@ -1,4 +1,6 @@
-﻿namespace Atm
+﻿using Atm.Services;
+
+namespace Atm
 {
     internal class Program
     {
