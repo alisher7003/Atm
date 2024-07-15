@@ -12,7 +12,7 @@ namespace Atm.Services
     {
         private Card EmvCard { get; set; }
         private decimal Money { get; set; }
-        private Logger LogHelper { get; set; }
+        private ILogger LogHelper { get; set; }
         public AtmService()
         {
             Initialize();
@@ -20,7 +20,7 @@ namespace Atm.Services
 
         private void Initialize()
         {
-            LogHelper = new V1Logger();
+            LogHelper = new V2Logger();
             Card card = new Card();
             card.Balance = 2000000;
             card.IsSmsOn = false;
