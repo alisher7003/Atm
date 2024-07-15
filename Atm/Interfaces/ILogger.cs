@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Atm
 {
-    internal abstract class Logger
+    internal interface ILogger
     {
-        internal abstract void LogInformation(string message);
+        void LogInformation(string message);
     }
 }
